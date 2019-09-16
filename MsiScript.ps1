@@ -3,35 +3,25 @@ $MsiListToInstall = @(
 )
   
 ### Set your database and credentials for database ###
-$DBName = "TPCentralDB"
-$DBLogin = "sa"
+$Server = "localhost"
+$DBName = "--DBName--"
+$DBLogin = "--Login--"
 $DBPassword = "--PasswordForDatabase--"
   
 ############################################################################################################
   
 Clear
   
-$ConnectionString = "Data Source=localhost;database=$($DBName);User ID=$($DBLogin);Password=$($DBPassword);"
-$sqlConn = new-object ("Data.SqlClient.SqlConnection") $ConnectionString
-  
+$ConnectionString = "Data Source=$($Server);database=$($DBName);User ID=$($DBLogin);Password=$($DBPassword);"
+
 $ERROR_SUCCESS_REBOOT_REQUIRED = 3010
   
-try
-{
-    $sqlConn.Open();
-}
-catch
-{
-    Write-Host "Database TPCentralDB is " -NoNewLine
-    Write-Host " UNAVAILABLE " -ForeGround White -BackGround Red
-    Write-Host "`nInstallation is aborted"
-      
-    $null = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown');
-      
+[string]$errorString = ""
+if(-not CheckDatabaseConnection($ConnectionString, $errorString)){
+    Write-Host $errorString
     exit
 }
-  
-$sqlConn.Close();
+
 $ErrorCount = 0
   
 $StartTime = Get-Date
